@@ -9,6 +9,7 @@ const DRAG_SENSITIVITY = 15
 const SWIPE_THRESHOLD = 30
 const CLOSE_SWIPE_THRESHOLD = 70
 const DOUBLE_TAP_THRESHOLD = 280
+const PHOTO_VIEW_SLIDE_DURATION = 320
 
 type Status =
   | "stationary"
@@ -26,6 +27,7 @@ type DragOption = {
 }
 
 type ClickMove = "left" | "right" | null
+type PhotoMoveDirection = "prev" | "next" | null
 
 const moveIndex = (idx: number, move: number) => {
   return (idx + move + GALLERY_IMAGES.length) % GALLERY_IMAGES.length
@@ -34,20 +36,47 @@ const moveIndex = (idx: number, move: number) => {
 const PhotoViewer = ({ initialIndex }: { initialIndex: number }) => {
   const { closeModal } = useModal()
   const [currentIndex, setCurrentIndex] = useState(initialIndex)
+  const [incomingIndex, setIncomingIndex] = useState<number | null>(null)
+  const [moveDirection, setMoveDirection] = useState<PhotoMoveDirection>(null)
   const [zoomed, setZoomed] = useState(false)
   const touchStartXRef = useRef<number | null>(null)
   const touchStartYRef = useRef<number | null>(null)
   const lastTapTsRef = useRef(0)
+  const moveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const isMoving = incomingIndex !== null
+
+  const movePhoto = useCallback(
+    (direction: Exclude<PhotoMoveDirection, null>) => {
+      if (isMoving) return
+      const nextIdx = moveIndex(currentIndex, direction === "prev" ? -1 : 1)
+      setIncomingIndex(nextIdx)
+      setMoveDirection(direction)
+      setZoomed(false)
+    },
+    [currentIndex, isMoving],
+  )
 
   const prev = useCallback(() => {
-    setCurrentIndex((idx) => moveIndex(idx, -1))
-    setZoomed(false)
-  }, [])
+    movePhoto("prev")
+  }, [movePhoto])
 
   const next = useCallback(() => {
-    setCurrentIndex((idx) => moveIndex(idx, 1))
-    setZoomed(false)
-  }, [])
+    movePhoto("next")
+  }, [movePhoto])
+
+  useEffect(() => {
+    if (incomingIndex === null || moveDirection === null) return
+    if (moveTimerRef.current !== null) {
+      clearTimeout(moveTimerRef.current)
+    }
+
+    moveTimerRef.current = setTimeout(() => {
+      setCurrentIndex(incomingIndex)
+      setIncomingIndex(null)
+      setMoveDirection(null)
+    }, PHOTO_VIEW_SLIDE_DURATION)
+  }, [incomingIndex, moveDirection])
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -63,7 +92,34 @@ const PhotoViewer = ({ initialIndex }: { initialIndex: number }) => {
     return () => window.removeEventListener("keydown", onKeyDown)
   }, [closeModal, next, prev])
 
+  useEffect(() => {
+    return () => {
+      if (moveTimerRef.current !== null) {
+        clearTimeout(moveTimerRef.current)
+      }
+    }
+  }, [])
+
   const image = GALLERY_IMAGES[currentIndex]
+  const incomingImage =
+    incomingIndex === null ? null : GALLERY_IMAGES[incomingIndex]
+  const shownImage = incomingImage ?? image
+  const shownIndex = incomingIndex ?? currentIndex
+  const currentImageClassName = [
+    "photo-frame current",
+    zoomed ? "zoomed" : "",
+    moveDirection === "next" ? "slide-out-left" : "",
+    moveDirection === "prev" ? "slide-out-right" : "",
+  ]
+    .filter(Boolean)
+    .join(" ")
+  const incomingImageClassName = [
+    "photo-frame incoming",
+    moveDirection === "next" ? "slide-in-right" : "",
+    moveDirection === "prev" ? "slide-in-left" : "",
+  ]
+    .filter(Boolean)
+    .join(" ")
 
   return (
     <div
@@ -73,6 +129,8 @@ const PhotoViewer = ({ initialIndex }: { initialIndex: number }) => {
         touchStartYRef.current = e.targetTouches[0].clientY
       }}
       onTouchEnd={(e) => {
+        if (isMoving) return
+
         const startX = touchStartXRef.current
         const startY = touchStartYRef.current
         if (startX === null || startY === null) return
@@ -117,11 +175,25 @@ const PhotoViewer = ({ initialIndex }: { initialIndex: number }) => {
           sizes={image.sizes}
           alt={image.alt}
           draggable={false}
-          className={zoomed ? "zoomed" : undefined}
-          onDoubleClick={() => setZoomed((z) => !z)}
+          className={currentImageClassName}
+          onDoubleClick={() => {
+            if (!isMoving) {
+              setZoomed((z) => !z)
+            }
+          }}
         />
+        {incomingImage && (
+          <img
+            src={incomingImage.src}
+            srcSet={incomingImage.srcSet}
+            sizes={incomingImage.sizes}
+            alt={incomingImage.alt}
+            draggable={false}
+            className={incomingImageClassName}
+          />
+        )}
       </div>
-      <div className="photo-view-caption">{image.caption}</div>
+      <div className="photo-view-caption">{shownImage.caption}</div>
       <button
         type="button"
         className="photo-nav left"
@@ -140,7 +212,7 @@ const PhotoViewer = ({ initialIndex }: { initialIndex: number }) => {
       </button>
       <div className="photo-view-dots" aria-hidden="true">
         {GALLERY_IMAGES.map((_, idx) => (
-          <span key={idx} className={idx === currentIndex ? "dot active" : "dot"} />
+          <span key={idx} className={idx === shownIndex ? "dot active" : "dot"} />
         ))}
       </div>
     </div>

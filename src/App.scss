@@ -36,6 +36,9 @@
   --motion-normal: 0.42s;
   --motion-slow: 0.75s;
   --ease-standard: cubic-bezier(0.22, 1, 0.36, 1);
+  --ornament-line-width: 42%;
+  --ornament-line-offset: 0.62rem;
+  --ornament-line-thickness: 1px;
 
   font-family:
     "MapoGoldenPier",
@@ -221,10 +224,10 @@ svg {
           content: "";
           position: absolute;
           left: 50%;
-          bottom: 0.62rem;
+          bottom: var(--ornament-line-offset);
           transform: translateX(-50%);
-          width: 42%;
-          height: 1px;
+          width: var(--ornament-line-width);
+          height: var(--ornament-line-thickness);
           border-radius: var(--radius-pill);
           background: linear-gradient(
             90deg,
@@ -280,10 +283,10 @@ svg {
         content: "";
         position: absolute;
         left: 50%;
-        top: 0.62rem;
+        top: var(--ornament-line-offset);
         transform: translateX(-50%);
-        width: 40%;
-        height: 1px;
+        width: var(--ornament-line-width);
+        height: var(--ornament-line-thickness);
         border-radius: var(--radius-pill);
         background: linear-gradient(
           90deg,

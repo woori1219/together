@@ -1,6 +1,7 @@
 $gallery-width: min(21rem, calc(100vw - 3rem));
 $gallery-height: clamp(22rem, 72vw, 30rem);
 $transition-duration: var(--motion-normal);
+$photo-view-slide-duration: 0.32s;
 
 @keyframes moving-right {
   from {
@@ -8,6 +9,42 @@ $transition-duration: var(--motion-normal);
   }
   to {
     transform: translateX(calc($gallery-width - 100%));
+  }
+}
+
+@keyframes photo-slide-out-left {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes photo-slide-out-right {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes photo-slide-in-left {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes photo-slide-in-right {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
   }
 }
 
@@ -241,6 +278,7 @@ $transition-duration: var(--motion-normal);
       aspect-ratio: 4 / 3;
       border-radius: 0.7rem;
       overflow: hidden;
+      position: relative;
       background:
         linear-gradient(
           180deg,
@@ -252,10 +290,13 @@ $transition-duration: var(--motion-normal);
       align-items: center;
       border: 1px solid rgba(214, 199, 182, 0.65);
 
-      img {
+      .photo-frame {
+        position: absolute;
+        inset: 0;
         width: 100%;
         height: 100%;
         object-fit: contain;
+        will-change: transform;
         transition: transform var(--motion-fast) var(--ease-standard);
 
         &.zoomed {
@@ -263,6 +304,34 @@ $transition-duration: var(--motion-normal);
           transform-origin: center center;
           cursor: zoom-out;
         }
+
+        &.slide-out-left {
+          animation: photo-slide-out-left $photo-view-slide-duration
+            var(--ease-standard) forwards;
+        }
+
+        &.slide-out-right {
+          animation: photo-slide-out-right $photo-view-slide-duration
+            var(--ease-standard) forwards;
+        }
+
+        &.slide-in-left {
+          animation: photo-slide-in-left $photo-view-slide-duration
+            var(--ease-standard) forwards;
+        }
+
+        &.slide-in-right {
+          animation: photo-slide-in-right $photo-view-slide-duration
+            var(--ease-standard) forwards;
+        }
+      }
+
+      .photo-frame.current {
+        z-index: 1;
+      }
+
+      .photo-frame.incoming {
+        z-index: 2;
       }
     }
 
