@@ -17,8 +17,15 @@ export const ModalProvider = ({ children }: PropsWithChildren) => {
   ) as React.RefObject<HTMLDivElement>
   const modalFocusTrapInitialized = useRef(false)
   const modalKey = useRef(0)
+  const focusReturnStack = useRef<(HTMLElement | null)[]>([])
 
   const openModal = useCallback((modalInfo: ModalInfo) => {
+    const activeElement =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null
+    focusReturnStack.current.push(activeElement)
+
     setModalInfoList((modalInfoList) => {
       if (modalInfoList.length === 0) {
         document.body.classList.add("modal-open")
@@ -28,6 +35,8 @@ export const ModalProvider = ({ children }: PropsWithChildren) => {
     modalFocusTrapInitialized.current = false
   }, [])
   const closeModal = useCallback(() => {
+    const focusTarget = focusReturnStack.current.pop() || null
+
     setModalInfoList((modalInfoList) => {
       const result = modalInfoList.slice(0, -1)
       if (result.length === 0) {
@@ -35,6 +44,16 @@ export const ModalProvider = ({ children }: PropsWithChildren) => {
       }
       return result
     })
+
+    window.setTimeout(() => {
+      if (
+        focusTarget &&
+        focusTarget.isConnected &&
+        typeof focusTarget.focus === "function"
+      ) {
+        focusTarget.focus()
+      }
+    }, 0)
   }, [])
 
   useEffect(() => {

@@ -121,6 +121,7 @@ const PhotoViewer = ({ initialIndex }: { initialIndex: number }) => {
           onDoubleClick={() => setZoomed((z) => !z)}
         />
       </div>
+      <div className="photo-view-caption">{image.caption}</div>
       <button
         type="button"
         className="photo-nav left"
@@ -514,7 +515,7 @@ export const Gallery = () => {
                       key={idx}
                       type="button"
                       className="photo-button"
-                      aria-label={`${idx + 1}번 사진 크게 보기`}
+                      aria-label={`${idx + 1}번 사진 크게 보기: ${image.caption}`}
                       onClick={() => {
                         if (idx !== slideRef.current) {
                           move(slideRef.current, idx)

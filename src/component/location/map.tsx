@@ -1,5 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { useEffect, useRef, useState } from "react"
-import { useKakao, useNaver } from "../store"
+import { loadKakaoSdk, loadNaverSdk } from "../store"
 import nmapIcon from "../../icons/nmap-icon.png"
 import knaviIcon from "../../icons/knavi-icon.png"
 import tmapIcon from "../../icons/tmap-icon.png"
@@ -13,8 +15,6 @@ import {
 } from "../../const"
 import { NAVER_MAP_CLIENT_ID } from "../../env"
 
-const MAP_LOAD_TIMEOUT_MS = 4500
-
 const checkDevice = () => {
   const userAgent = window.navigator.userAgent
   if (userAgent.match(/(iPhone|iPod|iPad)/)) {
@@ -26,7 +26,7 @@ const checkDevice = () => {
   }
 }
 
-const NavigationButtons = ({ kakao }: { kakao: any }) => {
+const NavigationButtons = () => {
   return (
     <div className="navigation">
       <button
@@ -53,18 +53,23 @@ const NavigationButtons = ({ kakao }: { kakao: any }) => {
       <button
         type="button"
         aria-label="카카오 내비 열기"
-        onClick={() => {
+        onClick={async () => {
           switch (checkDevice()) {
             case "ios":
-            case "android":
-              if (kakao)
+            case "android": {
+              const kakao = await loadKakaoSdk()
+              if (kakao) {
                 kakao.Navi.start({
                   name: LOCATION,
                   x: WEDDING_HALL_POSITION[0],
                   y: WEDDING_HALL_POSITION[1],
                   coordType: "wgs84",
                 })
+              } else {
+                alert("카카오 SDK를 불러오지 못했습니다.")
+              }
               break
+            }
             default:
               window.open(`https://map.kakao.com/link/map/${KMAP_PLACE_ID}`, "_blank")
               break
@@ -101,7 +106,6 @@ const NaverMap = ({ naver }: { naver: any }) => {
       center: WEDDING_HALL_POSITION,
       zoom: 17,
     })
-
     new naver.maps.Marker({ position: WEDDING_HALL_POSITION, map })
 
     return () => {
@@ -119,7 +123,7 @@ const NaverMap = ({ naver }: { naver: any }) => {
             if (lockMessageTimeout.current !== null) {
               clearTimeout(lockMessageTimeout.current)
             }
-            lockMessageTimeout.current = setTimeout(
+            lockMessageTimeout.current = window.setTimeout(
               () => setShowLockMessage(false),
               3000,
             )
@@ -129,7 +133,7 @@ const NaverMap = ({ naver }: { naver: any }) => {
             if (lockMessageTimeout.current !== null) {
               clearTimeout(lockMessageTimeout.current)
             }
-            lockMessageTimeout.current = setTimeout(
+            lockMessageTimeout.current = window.setTimeout(
               () => setShowLockMessage(false),
               3000,
             )
@@ -153,7 +157,7 @@ const NaverMap = ({ naver }: { naver: any }) => {
             clearTimeout(lockMessageTimeout.current)
           }
           setShowLockMessage(false)
-          setLocked((locked) => !locked)
+          setLocked((prev) => !prev)
         }}
       >
         {locked ? <LockIcon /> : <UnlockIcon />}
@@ -164,45 +168,81 @@ const NaverMap = ({ naver }: { naver: any }) => {
 }
 
 export const Map = () => {
-  const naver = useNaver()
-  const kakao = useKakao()
+  const [naver, setNaver] = useState<any>(null)
+  const [mapRequested, setMapRequested] = useState(false)
+  const [mapLoading, setMapLoading] = useState(false)
   const [mapUnavailable, setMapUnavailable] = useState(!NAVER_MAP_CLIENT_ID)
 
-  useEffect(() => {
+  const requestMapLoad = async () => {
     if (!NAVER_MAP_CLIENT_ID) {
       setMapUnavailable(true)
       return
     }
+    if (mapLoading || naver) return
 
-    if (naver) {
-      setMapUnavailable(false)
-      return
-    }
-
-    const timeout = window.setTimeout(() => {
-      if (!(window as any).naver) {
+    setMapRequested(true)
+    setMapLoading(true)
+    try {
+      const loadedNaver = await loadNaverSdk()
+      if (loadedNaver?.maps) {
+        setNaver(loadedNaver)
+        setMapUnavailable(false)
+      } else {
         setMapUnavailable(true)
       }
-    }, MAP_LOAD_TIMEOUT_MS)
-
-    return () => {
-      clearTimeout(timeout)
+    } catch {
+      setMapUnavailable(true)
+    } finally {
+      setMapLoading(false)
     }
-  }, [naver])
+  }
 
   return (
     <>
-      {mapUnavailable ? (
+      {!mapRequested && !mapUnavailable && (
+        <div className="map-fallback" role="status" aria-live="polite">
+          <div className="title">지도를 불러오시겠어요?</div>
+          <div className="description">
+            버튼을 누르면 네이버 지도를 로드합니다.
+          </div>
+          <button
+            type="button"
+            className="map-load-button"
+            onClick={requestMapLoad}
+          >
+            지도 불러오기
+          </button>
+        </div>
+      )}
+      {mapRequested && !mapUnavailable && (
+        <>
+          {mapLoading && (
+            <div className="map-fallback" role="status" aria-live="polite">
+              <div className="title">지도 불러오는 중...</div>
+              <div className="description">잠시만 기다려 주세요.</div>
+            </div>
+          )}
+          {naver && <NaverMap naver={naver} />}
+        </>
+      )}
+      {mapUnavailable && (
         <div className="map-fallback" role="status" aria-live="polite">
           <div className="title">지도 로딩에 실패했어요.</div>
           <div className="description">
             네이버 지도 API 연결이 원활하지 않아 길찾기 버튼으로 안내합니다.
           </div>
+          {NAVER_MAP_CLIENT_ID && (
+            <button
+              type="button"
+              className="map-load-button"
+              onClick={requestMapLoad}
+            >
+              다시 시도
+            </button>
+          )}
         </div>
-      ) : (
-        <NaverMap naver={naver} />
       )}
-      <NavigationButtons kakao={kakao} />
+      <NavigationButtons />
     </>
   )
 }

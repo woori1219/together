@@ -1,53 +1,73 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { useContext, useEffect } from "react"
-import { StoreContext } from "./context"
 import { KAKAO_SDK_JS_KEY, NAVER_MAP_CLIENT_ID } from "../../env"
 
 const baseUrl = import.meta.env.BASE_URL
-
-const NAVER_MAP_URL = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${NAVER_MAP_CLIENT_ID}`
 const KAKAO_SDK_URL = `${baseUrl}/kakao_js_sdk/2.7.1/kakao.min.js`
+const NAVER_MAP_URL = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${NAVER_MAP_CLIENT_ID}`
 
-export const useNaver = () => {
-  const { naver, setNaver } = useContext(StoreContext)
-  useEffect(() => {
-    if (!NAVER_MAP_CLIENT_ID) {
+const loadScriptOnce = (src: string) =>
+  new Promise<void>((resolve, reject) => {
+    const existing = document.querySelector(
+      `script[src="${src}"]`,
+    ) as HTMLScriptElement | null
+
+    if (existing) {
+      if (existing.dataset.loaded === "true") {
+        resolve()
+        return
+      }
+      existing.addEventListener("load", () => resolve(), { once: true })
+      existing.addEventListener("error", () => reject(new Error(src)), {
+        once: true,
+      })
       return
     }
 
-    if (!document.querySelector(`script[src="${NAVER_MAP_URL}"]`)) {
-      const script = document.createElement("script")
-      script.src = NAVER_MAP_URL
-      document.head.appendChild(script)
-      script.addEventListener("load", () => {
-        setNaver((window as any).naver)
-      })
-    }
-  }, [setNaver])
+    const script = document.createElement("script")
+    script.src = src
+    script.async = true
+    script.addEventListener(
+      "load",
+      () => {
+        script.dataset.loaded = "true"
+        resolve()
+      },
+      { once: true },
+    )
+    script.addEventListener("error", () => reject(new Error(src)), {
+      once: true,
+    })
+    document.head.appendChild(script)
+  })
 
-  return naver
+export const loadNaverSdk = async () => {
+  if (!NAVER_MAP_CLIENT_ID) return null
+
+  const naver = (window as any).naver
+  if (naver?.maps) return naver
+
+  await loadScriptOnce(NAVER_MAP_URL)
+  return (window as any).naver || null
 }
 
-export const useKakao = () => {
-  const { kakao, setKakao } = useContext(StoreContext)
-  useEffect(() => {
-    if (!KAKAO_SDK_JS_KEY) {
-      return
-    }
+export const loadKakaoSdk = async () => {
+  if (!KAKAO_SDK_JS_KEY) return null
 
-    if (!document.querySelector(`script[src="${KAKAO_SDK_URL}"]`)) {
-      const script = document.createElement("script")
-      script.addEventListener("load", () => {
-        if (!(window as any).Kakao.isInitialized()) {
-          ;(window as any).Kakao.init(KAKAO_SDK_JS_KEY)
-        }
-        setKakao((window as any).Kakao)
-      })
-      script.src = KAKAO_SDK_URL
-      document.head.appendChild(script)
+  const existing = (window as any).Kakao
+  if (existing) {
+    if (!existing.isInitialized()) {
+      existing.init(KAKAO_SDK_JS_KEY)
     }
-  }, [setKakao])
+    return existing
+  }
 
+  await loadScriptOnce(KAKAO_SDK_URL)
+  const kakao = (window as any).Kakao
+  if (!kakao) return null
+
+  if (!kakao.isInitialized()) {
+    kakao.init(KAKAO_SDK_JS_KEY)
+  }
   return kakao
 }
