@@ -1,19 +1,32 @@
 .calendar {
+  > div:first-of-type {
+    opacity: 0.86;
+    font-size: 0.92rem;
+    letter-spacing: 0.01em;
+  }
+
   .calendar-wrapper {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    margin: 1rem;
-    border: 1px solid var(--light-grey-color);
+    margin: 0.9rem 0.2rem 1rem;
+    border: 1px solid rgba(214, 199, 182, 0.8);
+    border-radius: 0.75rem;
+    overflow: hidden;
+    background-color: rgba(255, 255, 255, 0.6);
 
     > div {
       aspect-ratio: 1;
       display: flex;
       justify-content: center;
       align-items: center;
+      font-size: 0.86rem;
 
       &.head {
         aspect-ratio: auto;
-        background-color: var(--light-grey-color);
+        background-color: rgba(238, 227, 215, 0.65);
+        font-size: 0.74rem;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
       }
 
       &.holiday {
@@ -33,8 +46,8 @@
           width: 50%;
           height: 50%;
           background: var(--theme-color);
-          opacity: 0.6;
-          top: 35%;
+          opacity: 0.72;
+          top: 32%;
           left: 25%;
           position: absolute;
           transform: rotate(45deg);
@@ -70,29 +83,40 @@
 
     .countdown {
       display: grid;
-      width: 15rem;
+      width: min(15.8rem, 100%);
       grid-template-columns: 1fr 1rem 1fr 1rem 1fr 1rem 1fr;
       align-items: center;
+      background-color: rgba(255, 253, 249, 0.78);
+      border: 1px solid rgba(214, 199, 182, 0.8);
+      border-radius: 0.8rem;
+      padding: 0.65rem 0.55rem;
+
       * {
         margin: 0 0.1rem;
       }
+
       .count {
-        opacity: 0.8;
-        font-weight: bold;
-        font-size: 1.2rem;
+        opacity: 0.92;
+        font-weight: 600;
+        font-size: 1.15rem;
       }
+
       .unit {
-        font-weight: bold;
-        font-size: 0.6rem;
-        opacity: 0.5;
+        font-weight: 600;
+        font-size: 0.58rem;
+        opacity: 0.55;
       }
     }
 
     .message {
-      margin-top: 2rem;
-      margin-bottom: 1.5rem;
+      margin-top: 1.35rem;
+      margin-bottom: 0.35rem;
+      font-size: 0.92rem;
+      line-height: 1.6;
+
       .d-day {
         color: var(--theme-color);
+        font-weight: 600;
       }
     }
   }

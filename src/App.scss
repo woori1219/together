@@ -10,22 +10,27 @@
 @use "./component/shareButton";
 
 :root {
-  --theme-color: #c9a86c;
-  --theme-bg-color: #faf8f3;
-  --alt-color: #a89070;
-  --alt-bg-color: #f5f2eb;
-  --dark-color: #3d3d3d;
-  --dark-grey-color: #d2d2d2;
-  --light-grey-color: #f0ede6;
-  --light-color: #fffef9;
+  --theme-color: #b6864f;
+  --theme-bg-color: #f7f0e8;
+  --alt-color: #86623a;
+  --alt-bg-color: #f6eee4;
+  --dark-color: #3a332b;
+  --dark-grey-color: #d6c7b6;
+  --light-grey-color: #eee3d7;
+  --light-color: #fffdf9;
   --white-color: #ffffff;
-  --red-color: #d4a373;
+  --red-color: #cb8866;
+  --shadow-color: rgba(67, 42, 9, 0.14);
+  --shadow-soft-color: rgba(67, 42, 9, 0.08);
+  --radius-card: 1rem;
+  --radius-pill: 999px;
 
-  font-family: "MapoGoldenPier";
-  font-size: 20px;
-  @media (max-width: 500px) {
-    font-size: 4vw;
-  }
+  font-family:
+    "MapoGoldenPier",
+    "Times New Roman",
+    serif;
+  font-size: clamp(16px, 1.25vw + 10px, 20px);
+  text-rendering: optimizeLegibility;
 }
 
 @media print {
@@ -62,18 +67,16 @@ $colors: (
 @keyframes lazy-fade-in {
   from {
     opacity: 0;
-    z-index: 3;
-    transform: translateY(2rem);
+    transform: translateY(1rem);
   }
   to {
     opacity: 1;
-    z-index: 3;
     transform: translateY(0);
   }
 }
 
 button {
-  font-family: "MapoGoldenPier";
+  font-family: inherit;
   font-size: 1rem;
   border: none;
   background-color: transparent;
@@ -84,7 +87,11 @@ body {
   margin: 0;
   overflow-x: hidden;
   overflow-y: auto;
-  height: 100vh;
+  min-height: 100vh;
+  color: var(--dark-color);
+  background-color: var(--theme-bg-color);
+  line-height: 1.6;
+
   &.modal-open {
     overflow-y: hidden;
   }
@@ -95,44 +102,64 @@ body {
 
 * {
   box-sizing: border-box;
-  color: var(--dark-color);
+}
+
+img,
+svg {
   user-select: none;
 }
 
 .background {
-  background-color: var(--theme-bg-color);
+  position: relative;
+  background:
+    radial-gradient(
+      48rem 20rem at -15% -10%,
+      rgba(182, 134, 79, 0.16) 0%,
+      rgba(182, 134, 79, 0) 68%
+    ),
+    radial-gradient(
+      45rem 24rem at 120% 0%,
+      rgba(203, 136, 102, 0.12) 0%,
+      rgba(203, 136, 102, 0) 72%
+    ),
+    linear-gradient(180deg, #fcf8f2 0%, #f4ece0 100%);
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   min-height: 100vh;
   min-width: 100vw;
+  padding: 1.25rem 0.75rem 2rem;
+
+  @media (max-width: 500px) {
+    padding: 0.9rem 0.25rem 1.25rem;
+  }
 
   .card-view {
-    width: 980px;
+    width: min(980px, 100%);
     text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
 
     @media (max-width: 980px) {
-      width: 500px;
-    }
-
-    @media (max-width: 500px) {
-      width: 100vw;
+      width: min(500px, 100%);
     }
 
     .card-group {
       position: relative;
-      @media (width > 980px) {
-        display: flex;
-        flex-direction: row;
-        box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
-        margin: 10px;
-        background-color: var(--light-color);
+      display: flex;
+      flex-direction: row;
+      gap: 0.75rem;
+      border-radius: calc(var(--radius-card) + 0.2rem);
+      overflow: visible;
 
+      @media (width > 980px) {
         opacity: 0;
         &.lazy-active {
           animation-name: lazy-fade-in;
-          animation-duration: 3s;
+          animation-duration: 0.8s;
+          animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
           opacity: 1;
         }
 
@@ -143,25 +170,41 @@ body {
         }
       }
 
+      @media (max-width: 980px) {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
       .card {
-        background-color: var(--light-color);
-        padding: 1rem;
-        border: 1px solid var(--light-grey-color);
+        background:
+          linear-gradient(
+            180deg,
+            rgba(255, 255, 255, 0.92) 0%,
+            rgba(255, 253, 249, 0.94) 100%
+          );
+        backdrop-filter: blur(1.5px);
+        padding: 1.35rem 1.2rem;
+        border: 1px solid rgba(214, 199, 182, 0.8);
+        border-radius: var(--radius-card);
         width: 50%;
         display: flex;
         flex-direction: column;
         justify-content: center;
         position: relative;
+        box-shadow:
+          0 14px 28px var(--shadow-color),
+          0 2px 8px var(--shadow-soft-color);
 
         @media (max-width: 980px) {
-          box-shadow: 0 0 0.5rem 0 rgba(0, 0, 0, 0.2);
-          margin: 0.5rem;
+          margin: 0.4rem;
           width: inherit;
+          padding: 1.2rem 1rem;
 
           opacity: 0;
           &.lazy-active {
             animation-name: lazy-fade-in;
-            animation-duration: 3s;
+            animation-duration: 0.75s;
+            animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
             opacity: 1;
           }
 
@@ -176,16 +219,25 @@ body {
 
     .footer {
       position: relative;
-      background-color: var(--light-color);
-      box-shadow: 0 0 0.5rem 0 rgba(0, 0, 0, 0.2);
-      margin: 0.5rem;
+      background:
+        linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.9) 0%,
+          rgba(255, 253, 249, 0.94) 100%
+        );
+      border-radius: var(--radius-card);
+      border: 1px solid rgba(214, 199, 182, 0.8);
+      box-shadow:
+        0 14px 28px var(--shadow-color),
+        0 2px 8px var(--shadow-soft-color);
+      margin: 0.4rem;
       opacity: 0;
-      margin: 0.5rem;
-      padding: 1rem;
-      opacity: 0;
+      padding: 1rem 1.1rem;
+
       &.lazy-active {
         animation-name: lazy-fade-in;
-        animation-duration: 3s;
+        animation-duration: 0.75s;
+        animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
         opacity: 1;
       }
 
@@ -199,14 +251,50 @@ body {
 }
 
 h2 {
-  font-size: 1.5rem;
+  font-size: 1.35rem;
+  letter-spacing: 0.03em;
   color: var(--theme-color);
-  font-weight: normal;
+  font-weight: 500;
+  margin: 0;
+
+  &::after {
+    content: "";
+    display: block;
+    width: 2.7rem;
+    height: 2px;
+    margin: 0.45rem auto 0;
+    border-radius: var(--radius-pill);
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(182, 134, 79, 0.2) 15%,
+      rgba(182, 134, 79, 0.9) 50%,
+      rgba(182, 134, 79, 0.2) 85%,
+      transparent 100%
+    );
+  }
+
   &.english {
     font-family: "Allura";
+    font-size: 1.9rem;
+    font-weight: 400;
+    letter-spacing: 0;
+
+    &::after {
+      width: 3.1rem;
+    }
   }
 }
 
 div.break {
-  height: 1rem;
+  height: 0.85rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0ms !important;
+    scroll-behavior: auto !important;
+  }
 }

@@ -1,63 +1,93 @@
 .information {
   .info-card {
-    margin-top: 1.5rem;
-    margin-bottom: 0.5rem;
-    padding: 2rem 1rem 1rem 1rem;
-
+    margin-top: 1.25rem;
+    margin-bottom: 0.45rem;
+    padding: 1.65rem 0.95rem 1rem;
     position: relative;
-    border: 1px solid var(--alt-color);
-    border-radius: 0.5rem;
+    border: 1px solid rgba(134, 98, 58, 0.6);
+    border-radius: 0.8rem;
+    background:
+      linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.75) 0%,
+        rgba(255, 251, 245, 0.92) 100%
+      );
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+
     .label {
       position: absolute;
       left: 50%;
       top: -1rem;
       transform: translateX(-50%);
-      padding: 0.5rem 2rem 0.5rem 2rem;
-      border-radius: 1rem;
-      background-color: var(--alt-bg-color);
-      border: 1px solid var(--alt-color);
+      padding: 0.4rem 1.35rem;
+      border-radius: 999px;
+      background-color: #f9f0e4;
+      border: 1px solid rgba(134, 98, 58, 0.55);
+      font-size: 0.88rem;
+      white-space: nowrap;
     }
   }
+
   .content {
-    line-height: 1.9;
-    font-size: 0.9rem;
+    line-height: 1.8;
+    font-size: 0.87rem;
+    letter-spacing: 0.005em;
+  }
+
+  button.button {
+    width: 100%;
   }
 }
 
 .donation-modal {
-  width: 22rem;
+  width: min(22rem, 92vw);
 
   .header {
     .title {
       text-align: center;
       font-size: 1.2rem;
       color: var(--theme-color);
-      padding-bottom: 1rem;
-      border-bottom: 1px solid var(--dark-grey-color);
+      padding-bottom: 0.8rem;
+      border-bottom: 1px solid rgba(214, 199, 182, 0.8);
     }
   }
+
   .content {
-    padding: 0 0.7rem 0.7rem 0.7rem;
+    padding: 0 0.7rem 0.7rem;
 
     .account-info {
-      margin-top: 1rem;
-      margin-bottom: 1rem;
+      margin-top: 0.75rem;
+      margin-bottom: 0.75rem;
       display: flex;
       flex-direction: row;
       justify-content: space-between;
       align-items: center;
+      gap: 0.65rem;
+      padding-bottom: 0.7rem;
+      border-bottom: 1px dashed rgba(214, 199, 182, 0.75);
+
+      &:last-child {
+        border-bottom: none;
+      }
+
       .name {
-        margin-bottom: 0.3rem;
+        margin-bottom: 0.25rem;
+
         .relation {
           opacity: 0.7;
         }
       }
+
       .account {
         white-space: nowrap;
-      }
-      .copy-button {
         font-size: 0.8rem;
-        padding: 0.4rem 0.8rem;
+      }
+
+      .copy-button {
+        font-size: 0.74rem;
+        min-height: 2.2rem;
+        padding: 0.4rem 0.75rem;
+        white-space: nowrap;
       }
     }
   }
@@ -69,53 +99,58 @@
 }
 
 .attendance-modal {
-  width: 22rem;
+  width: min(22rem, 92vw);
 
   .header {
     .title {
       text-align: center;
       font-size: 1.2rem;
       color: var(--theme-color);
-      padding-bottom: 1rem;
-      border-bottom: 1px solid var(--dark-grey-color);
+      padding-bottom: 0.8rem;
+      border-bottom: 1px solid rgba(214, 199, 182, 0.8);
     }
   }
 
   .content {
-    padding: 0 1rem 1rem 1rem;
+    padding: 0 1rem 1rem;
 
     .form {
       display: flex;
       flex-direction: column;
-      margin-top: 1rem;
-      gap: 1.5rem;
+      margin-top: 0.9rem;
+      gap: 1.15rem;
 
       .input-group {
         display: flex;
         flex-direction: column;
-        gap: 0.2rem;
+        gap: 0.28rem;
 
         .input {
           display: flex;
           flex-direction: column;
         }
+
         .select-input {
           display: flex;
           flex-direction: row;
 
           label {
             width: 100%;
+
             span {
-              padding: 0.4rem;
+              padding: 0.56rem 0.4rem;
               display: inline-block;
               text-align: center;
               width: 100%;
               background-color: var(--light-grey-color);
+              font-size: 0.78rem;
             }
+
             input {
               &:checked + span {
                 border: 2px solid var(--alt-color);
               }
+
               & + span {
                 border: 2px solid var(--light-grey-color);
               }
@@ -131,10 +166,10 @@
         }
 
         input {
-          padding: 0.5rem;
-          margin-bottom: 0.5rem;
-          border: 1px solid var(--light-grey-color);
-          border-radius: 0.3rem;
+          padding: 0.62rem;
+          margin-bottom: 0.35rem;
+          border: 1px solid rgba(214, 199, 182, 0.8);
+          border-radius: 0.42rem;
           font-family: "MapoGoldenPier";
           font-size: 0.8rem;
         }
@@ -145,6 +180,7 @@
   .footer {
     display: flex;
     flex-direction: row;
+
     button {
       width: 100%;
     }
@@ -152,30 +188,34 @@
 }
 
 .attendance-info-modal {
-  width: 22rem;
+  width: min(22rem, 92vw);
 
   .header {
     .title {
       text-align: center;
       font-size: 1.2rem;
       color: var(--theme-color);
-      padding-bottom: 1rem;
-      border-bottom: 1px solid var(--dark-grey-color);
+      padding-bottom: 0.8rem;
+      border-bottom: 1px solid rgba(214, 199, 182, 0.8);
     }
   }
 
   .content {
-    padding: 1.5rem 1rem 1.5rem 1rem;
+    padding: 1.25rem 1rem;
+
     .info-message {
       text-align: center;
-      line-height: 1.5rem;
-      padding-bottom: 1.5rem;
+      line-height: 1.55;
+      padding-bottom: 1.15rem;
       border-bottom: 1px dotted var(--dark-grey-color);
     }
+
     .wedding-info {
-      padding-top: 1.5rem;
-      padding-left: 2rem;
-      line-height: 1.5rem;
+      padding-top: 1.15rem;
+      padding-left: 1.25rem;
+      line-height: 1.65;
+      font-size: 0.86rem;
+
       svg {
         width: 0.8rem;
         height: 0.8rem;
@@ -186,6 +226,7 @@
   .footer {
     display: flex;
     flex-direction: row;
+
     button {
       width: 100%;
     }
