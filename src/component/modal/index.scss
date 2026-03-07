@@ -19,7 +19,8 @@
   backdrop-filter: blur(2.5px);
 
   animation-name: modal-fade-in;
-  animation-duration: 0.25s;
+  animation-duration: var(--motion-fast);
+  animation-timing-function: var(--ease-standard);
   opacity: 1;
 
   display: flex;
@@ -32,14 +33,16 @@
     border: 1px solid rgba(214, 199, 182, 0.85);
     box-shadow: 0 20px 44px rgba(30, 19, 8, 0.24);
     animation-name: modal-fade-in;
-    animation-duration: 0.25s;
+    animation-duration: var(--motion-fast);
+    animation-timing-function: var(--ease-standard);
     opacity: 1;
     max-width: min(92vw, 26rem);
 
     .header {
-      padding: 0.55rem 0.55rem 0.15rem;
+      padding: 0.55rem 0.55rem 0.32rem;
       background-color: transparent;
       z-index: 7;
+      min-height: 2.15rem;
 
       .close-button-wrapper {
         display: flex;
@@ -79,12 +82,35 @@
           }
         }
       }
+
+      .title,
+      .title-group .title {
+        text-align: center;
+        font-size: 1.15rem;
+        color: var(--theme-color);
+        padding-bottom: 0.7rem;
+        border-bottom: 1px solid rgba(214, 199, 182, 0.8);
+      }
+
+      .title-group .subtitle {
+        margin-top: 0.35rem;
+        text-align: center;
+        font-size: 0.82rem;
+        color: var(--text-secondary);
+      }
     }
 
     .content {
       max-height: 80vh;
       overflow: auto;
       scrollbar-width: thin;
+      color: var(--text-primary);
+    }
+
+    .footer {
+      button.button {
+        min-height: 2.7rem;
+      }
     }
   }
 }
