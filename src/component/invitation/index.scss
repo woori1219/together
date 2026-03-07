@@ -52,7 +52,7 @@
     .contact-info {
       padding: 0.8rem 0.5rem;
       display: grid;
-      grid-template-columns: 8rem 7rem 1fr;
+      grid-template-columns: 6.4rem minmax(4.7rem, 1fr) auto;
       row-gap: 0.6rem;
       border-bottom: 1px dashed rgba(214, 199, 182, 0.8);
 
@@ -83,6 +83,19 @@
         border-radius: 0.45rem;
         min-width: 2rem;
         min-height: 2rem;
+      }
+
+      .actions {
+        display: inline-flex;
+        align-items: center;
+        justify-content: flex-start;
+        flex-wrap: nowrap;
+        white-space: nowrap;
+        gap: 0.15rem;
+      }
+
+      @media (max-width: 360px) {
+        grid-template-columns: 5.6rem minmax(4.4rem, 1fr) auto;
       }
     }
   }

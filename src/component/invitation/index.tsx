@@ -71,7 +71,7 @@ export const Invitation = () => {
                       <Fragment key={relation}>
                         <div className="relation">{relation}</div>
                         <div>{name}</div>
-                        <div>
+                        <div className="actions">
                           <button
                             type="button"
                             className="icon-button"
@@ -103,7 +103,7 @@ export const Invitation = () => {
                       <Fragment key={relation}>
                         <div className="relation">{relation}</div>
                         <div>{name}</div>
-                        <div>
+                        <div className="actions">
                           <button
                             type="button"
                             className="icon-button"
