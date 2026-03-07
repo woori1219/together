@@ -40,7 +40,7 @@ cp .env.example .env
 
 - Main invitation data: `src/const.ts`
 - Images and assets: `src/images`, `public/`
-- Shared preview image: `public/preview_image.png`
+- Shared preview image: `public/preview_image.jpg`
 
 ## GitHub Pages deployment
 

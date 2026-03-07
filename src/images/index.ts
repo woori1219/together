@@ -1,5 +1,5 @@
-import coverImage from "./cover.png"
-import image1 from "./image1.png"
+import coverImage from "./cover.webp"
+import image1 from "./image1.webp"
 
 export const COVER_IMAGE = coverImage
 
