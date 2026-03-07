@@ -30,6 +30,78 @@ type DragOption = {
 
 type ClickMove = "left" | "right" | null
 
+const SWIPE_THRESHOLD = 30
+
+const moveIndex = (idx: number, move: number) => {
+  return (idx + move + GALLERY_IMAGES.length) % GALLERY_IMAGES.length
+}
+
+const PhotoViewer = ({ initialIndex }: { initialIndex: number }) => {
+  const [currentIndex, setCurrentIndex] = useState(initialIndex)
+  const touchStartXRef = useRef<number | null>(null)
+
+  const prev = useCallback(() => {
+    setCurrentIndex((idx) => moveIndex(idx, -1))
+  }, [])
+
+  const next = useCallback(() => {
+    setCurrentIndex((idx) => moveIndex(idx, 1))
+  }, [])
+
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft") {
+        prev()
+      } else if (e.key === "ArrowRight") {
+        next()
+      }
+    }
+    window.addEventListener("keydown", onKeyDown)
+    return () => window.removeEventListener("keydown", onKeyDown)
+  }, [next, prev])
+
+  return (
+    <div
+      className="photo-viewer"
+      onTouchStart={(e) => {
+        touchStartXRef.current = e.targetTouches[0].clientX
+      }}
+      onTouchEnd={(e) => {
+        const startX = touchStartXRef.current
+        if (startX === null) return
+
+        const endX = e.changedTouches[0].clientX
+        const diff = endX - startX
+
+        if (Math.abs(diff) < SWIPE_THRESHOLD) return
+
+        if (diff > 0) {
+          prev()
+        } else {
+          next()
+        }
+      }}
+    >
+      <div className="photo-view-wrapper">
+        <img
+          src={GALLERY_IMAGES[currentIndex]}
+          alt={`gallery-${currentIndex + 1}`}
+          draggable={false}
+        />
+      </div>
+      <button type="button" className="photo-nav left" onClick={prev}>
+        <ArrowLeft className="arrow" />
+      </button>
+      <button type="button" className="photo-nav right" onClick={next}>
+        <ArrowLeft className="arrow" />
+      </button>
+      <div className="photo-view-index">
+        {currentIndex + 1} / {GALLERY_IMAGES.length}
+      </div>
+    </div>
+  )
+}
+
 export const Gallery = () => {
   const { openModal, closeModal } = useModal()
   const carouselRef = useRef<HTMLDivElement>({} as HTMLDivElement)
@@ -39,28 +111,10 @@ export const Gallery = () => {
       openModal({
         className: "photo-view-modal",
         closeOnClickBackground: true,
-        header: <div className="title">사진 크게 보기</div>,
-        content: (
-          <div className="photo-view-wrapper">
-            <img
-              src={GALLERY_IMAGES[idx]}
-              alt={`gallery-${idx + 1}`}
-              draggable={false}
-            />
-          </div>
-        ),
-        footer: (
-          <Button
-            buttonStyle="style2"
-            className="bg-light-grey-color text-dark-color"
-            onClick={closeModal}
-          >
-            닫기
-          </Button>
-        ),
+        content: <PhotoViewer initialIndex={idx} />,
       })
     },
-    [openModal, closeModal],
+    [openModal],
   )
 
   useEffect(() => {

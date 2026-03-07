@@ -180,26 +180,28 @@ $transition-duration: 0.3s;
 }
 
 .photo-view-modal {
-  width: min(28rem, 94vw);
+  width: min(36rem, 96vw);
 
   .header {
-    .title {
-      text-align: center;
-      font-size: 1.2rem;
-      color: var(--theme-color);
-      padding-bottom: 0.8rem;
-    }
+    padding-bottom: 0;
   }
 
   .content {
-    padding: 0 0.7rem 0.7rem;
+    padding: 0.1rem 0.5rem 0.65rem;
+
+    .photo-viewer {
+      position: relative;
+      width: 100%;
+      user-select: none;
+      touch-action: pan-y;
+    }
 
     .photo-view-wrapper {
       width: 100%;
-      aspect-ratio: 1 / 1;
+      aspect-ratio: 4 / 3;
       border-radius: 0.7rem;
       overflow: hidden;
-      background-color: rgba(0, 0, 0, 0.04);
+      background-color: rgba(0, 0, 0, 0.08);
       display: flex;
       justify-content: center;
       align-items: center;
@@ -207,13 +209,59 @@ $transition-duration: 0.3s;
       img {
         width: 100%;
         height: 100%;
-        object-fit: contain;
+        object-fit: cover;
       }
+    }
+
+    .photo-nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 2.2rem;
+      height: 2.2rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(17, 17, 17, 0.42);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      z-index: 2;
+
+      .arrow {
+        width: 1.35rem;
+        fill: rgba(255, 255, 255, 0.95);
+      }
+
+      &.left {
+        left: 0.55rem;
+      }
+
+      &.right {
+        right: 0.55rem;
+
+        .arrow {
+          transform: rotate(180deg);
+        }
+      }
+    }
+
+    .photo-view-index {
+      position: absolute;
+      left: 50%;
+      bottom: 0.55rem;
+      transform: translateX(-50%);
+      padding: 0.28rem 0.55rem;
+      border-radius: 999px;
+      background-color: rgba(17, 17, 17, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      color: rgba(255, 255, 255, 0.96);
+      font-size: 0.68rem;
+      line-height: 1;
+      z-index: 2;
     }
   }
 
   .footer {
-    display: flex;
-    flex-direction: column;
+    display: none;
   }
 }
