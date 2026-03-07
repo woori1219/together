@@ -70,11 +70,19 @@
         opacity: 0.75;
         width: 1.05rem;
         height: 1.05rem;
-        cursor: pointer;
 
         &.flip {
           transform: scaleX(-1);
         }
+      }
+
+      .icon-button {
+        border: none;
+        background: transparent;
+        padding: 0.32rem;
+        border-radius: 0.45rem;
+        min-width: 2rem;
+        min-height: 2rem;
       }
     }
   }

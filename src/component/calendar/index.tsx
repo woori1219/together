@@ -115,7 +115,7 @@ export const Calendar = () => {
           <span>:</span>
           <div className="count">{diffs.seconds}</div>
         </div>
-        <div className="message">
+        <div className="message" role="status" aria-live="polite">
           {GROOM_FIRSTNAME} & {BRIDE_FIRSTNAME}의 결혼식이{" "}
           {dayDiff > 0 ? (
             <>

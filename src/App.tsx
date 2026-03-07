@@ -27,7 +27,7 @@ function App() {
           {/* 결혼식 날짜 (달력) */}
           <Calendar />
 
-          {/* 겔러리 */}
+          {/* 갤러리 */}
           <Gallery />
         </LazyDiv>
 

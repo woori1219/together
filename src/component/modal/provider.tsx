@@ -105,13 +105,20 @@ export const ModalProvider = ({ children }: PropsWithChildren) => {
           >
             <div
               className={`modal${modalInfo.className ? ` ${modalInfo.className}` : ""}`}
+              role="dialog"
+              aria-modal="true"
               onClick={(e) => {
                 e.stopPropagation()
               }}
             >
               <div className="header">
                 <div className="close-button-wrapper">
-                  <button className="close-button" onClick={closeModal} />
+                  <button
+                    type="button"
+                    className="close-button"
+                    aria-label="모달 닫기"
+                    onClick={closeModal}
+                  />
                 </div>
                 {modalInfo.header}
               </div>

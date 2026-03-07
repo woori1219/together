@@ -72,18 +72,26 @@ export const Invitation = () => {
                         <div className="relation">{relation}</div>
                         <div>{name}</div>
                         <div>
-                          <PhoneIcon
-                            className="flip icon"
+                          <button
+                            type="button"
+                            className="icon-button"
+                            aria-label={`${name}에게 전화하기`}
                             onClick={() => {
                               window.open(`tel:${phone}`, "_self")
                             }}
-                          />
-                          <EnvelopeIcon
-                            className="icon"
+                          >
+                            <PhoneIcon className="flip icon" />
+                          </button>
+                          <button
+                            type="button"
+                            className="icon-button"
+                            aria-label={`${name}에게 문자 보내기`}
                             onClick={() => {
                               window.open(`sms:${phone}`, "_self")
                             }}
-                          />
+                          >
+                            <EnvelopeIcon className="icon" />
+                          </button>
                         </div>
                       </Fragment>
                     ),
@@ -96,18 +104,26 @@ export const Invitation = () => {
                         <div className="relation">{relation}</div>
                         <div>{name}</div>
                         <div>
-                          <PhoneIcon
-                            className="flip icon"
+                          <button
+                            type="button"
+                            className="icon-button"
+                            aria-label={`${name}에게 전화하기`}
                             onClick={() => {
                               window.open(`tel:${phone}`, "_self")
                             }}
-                          />
-                          <EnvelopeIcon
-                            className="icon"
+                          >
+                            <PhoneIcon className="flip icon" />
+                          </button>
+                          <button
+                            type="button"
+                            className="icon-button"
+                            aria-label={`${name}에게 문자 보내기`}
                             onClick={() => {
                               window.open(`sms:${phone}`, "_self")
                             }}
-                          />
+                          >
+                            <EnvelopeIcon className="icon" />
+                          </button>
                         </div>
                       </Fragment>
                     ),

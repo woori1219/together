@@ -7,11 +7,13 @@ import {
   WEDDING_DATE,
   WEDDING_DATE_FORMAT,
 } from "../../const"
+import { PREVIEW_IMAGE_VERSION } from "../../env"
 import ktalkIcon from "../../icons/ktalk-icon.png"
 import { LazyDiv } from "../lazyDiv"
 import { useKakao } from "../store"
 
 const baseUrl = import.meta.env.BASE_URL
+const previewImagePath = `${baseUrl.replace(/\/$/, "")}/preview_image.jpg?v=${PREVIEW_IMAGE_VERSION}`
 
 export const ShareButton = () => {
   const kakao = useKakao()
@@ -39,8 +41,7 @@ export const ShareButton = () => {
                 window.location.protocol +
                 "//" +
                 window.location.host +
-                baseUrl +
-                "/preview_image.jpg",
+                previewImagePath,
               link: {
                 mobileWebUrl:
                   window.location.protocol +

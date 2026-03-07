@@ -5,13 +5,10 @@ import { Button } from "../button"
 import { useModal } from "../modal"
 import { GALLERY_IMAGES } from "../../images"
 
-const CAROUSEL_ITEMS = GALLERY_IMAGES.map((item, idx) => (
-  <div className="carousel-item" key={idx}>
-    <img src={item} draggable={false} alt={`${idx}`} />
-  </div>
-))
-
 const DRAG_SENSITIVITY = 15
+const SWIPE_THRESHOLD = 30
+const CLOSE_SWIPE_THRESHOLD = 70
+const DOUBLE_TAP_THRESHOLD = 280
 
 type Status =
   | "stationary"
@@ -30,22 +27,26 @@ type DragOption = {
 
 type ClickMove = "left" | "right" | null
 
-const SWIPE_THRESHOLD = 30
-
 const moveIndex = (idx: number, move: number) => {
   return (idx + move + GALLERY_IMAGES.length) % GALLERY_IMAGES.length
 }
 
 const PhotoViewer = ({ initialIndex }: { initialIndex: number }) => {
+  const { closeModal } = useModal()
   const [currentIndex, setCurrentIndex] = useState(initialIndex)
+  const [zoomed, setZoomed] = useState(false)
   const touchStartXRef = useRef<number | null>(null)
+  const touchStartYRef = useRef<number | null>(null)
+  const lastTapTsRef = useRef(0)
 
   const prev = useCallback(() => {
     setCurrentIndex((idx) => moveIndex(idx, -1))
+    setZoomed(false)
   }, [])
 
   const next = useCallback(() => {
     setCurrentIndex((idx) => moveIndex(idx, 1))
+    setZoomed(false)
   }, [])
 
   useEffect(() => {
@@ -54,53 +55,110 @@ const PhotoViewer = ({ initialIndex }: { initialIndex: number }) => {
         prev()
       } else if (e.key === "ArrowRight") {
         next()
+      } else if (e.key === "Escape") {
+        closeModal()
       }
     }
     window.addEventListener("keydown", onKeyDown)
     return () => window.removeEventListener("keydown", onKeyDown)
-  }, [next, prev])
+  }, [closeModal, next, prev])
+
+  const image = GALLERY_IMAGES[currentIndex]
 
   return (
     <div
       className="photo-viewer"
       onTouchStart={(e) => {
         touchStartXRef.current = e.targetTouches[0].clientX
+        touchStartYRef.current = e.targetTouches[0].clientY
       }}
       onTouchEnd={(e) => {
         const startX = touchStartXRef.current
-        if (startX === null) return
+        const startY = touchStartYRef.current
+        if (startX === null || startY === null) return
 
         const endX = e.changedTouches[0].clientX
-        const diff = endX - startX
+        const endY = e.changedTouches[0].clientY
+        const diffX = endX - startX
+        const diffY = endY - startY
 
-        if (Math.abs(diff) < SWIPE_THRESHOLD) return
+        const absX = Math.abs(diffX)
+        const absY = Math.abs(diffY)
 
-        if (diff > 0) {
-          prev()
-        } else {
-          next()
+        if (absY >= CLOSE_SWIPE_THRESHOLD && absY > absX) {
+          closeModal()
+          return
+        }
+
+        if (absX >= SWIPE_THRESHOLD && absX > absY) {
+          if (diffX > 0) {
+            prev()
+          } else {
+            next()
+          }
+          return
+        }
+
+        if (absX < 10 && absY < 10) {
+          const now = Date.now()
+          if (now - lastTapTsRef.current <= DOUBLE_TAP_THRESHOLD) {
+            setZoomed((z) => !z)
+            lastTapTsRef.current = 0
+          } else {
+            lastTapTsRef.current = now
+          }
         }
       }}
     >
       <div className="photo-view-wrapper">
         <img
-          src={GALLERY_IMAGES[currentIndex]}
-          alt={`gallery-${currentIndex + 1}`}
+          src={image.src}
+          srcSet={image.srcSet}
+          sizes={image.sizes}
+          alt={image.alt}
           draggable={false}
+          className={zoomed ? "zoomed" : undefined}
+          onDoubleClick={() => setZoomed((z) => !z)}
         />
       </div>
-      <button type="button" className="photo-nav left" onClick={prev}>
+      <button
+        type="button"
+        className="photo-nav left"
+        onClick={prev}
+        aria-label="이전 사진 보기"
+      >
         <ArrowLeft className="arrow" />
       </button>
-      <button type="button" className="photo-nav right" onClick={next}>
+      <button
+        type="button"
+        className="photo-nav right"
+        onClick={next}
+        aria-label="다음 사진 보기"
+      >
         <ArrowLeft className="arrow" />
       </button>
-      <div className="photo-view-index">
-        {currentIndex + 1} / {GALLERY_IMAGES.length}
+      <div className="photo-view-dots" aria-hidden="true">
+        {GALLERY_IMAGES.map((_, idx) => (
+          <span key={idx} className={idx === currentIndex ? "dot active" : "dot"} />
+        ))}
       </div>
     </div>
   )
 }
+
+const CAROUSEL_ITEMS = GALLERY_IMAGES.map((item, idx) => (
+  <div className="carousel-item" key={idx}>
+    <img
+      src={item.src}
+      srcSet={item.srcSet}
+      sizes={item.sizes}
+      draggable={false}
+      alt={item.alt}
+      loading={idx === 0 ? "eager" : "lazy"}
+      decoding="async"
+    />
+  </div>
+))
 
 export const Gallery = () => {
   const { openModal, closeModal } = useModal()
@@ -118,10 +176,11 @@ export const Gallery = () => {
   )
 
   useEffect(() => {
-    // preload images
     GALLERY_IMAGES.forEach((image) => {
       const img = new Image()
-      img.src = image
+      img.src = image.src
+      img.srcset = image.srcSet
+      img.sizes = image.sizes
     })
   }, [])
 
@@ -163,11 +222,6 @@ export const Gallery = () => {
   const setClickMove = (clickMove: ClickMove) => {
     clickMoveRef.current = clickMove
   }
-
-  // For debugging
-  // useEffect(() => {
-  //   console.log(status)
-  // }, [status])
 
   const click = (
     status: Status,
@@ -224,7 +278,7 @@ export const Gallery = () => {
           currentTranslateX: -carouselWidth,
         })
         setStatus("stationary")
-        setSlide((slide + move + CAROUSEL_ITEMS.length) % CAROUSEL_ITEMS.length)
+        setSlide(moveIndex(slide, move))
       }, 300)
     },
     [],
@@ -246,7 +300,6 @@ export const Gallery = () => {
     }, 300)
   }, [])
 
-  /* Events */
   const onMouseMove = useCallback(
     (e: MouseEvent) => {
       const status = statusRef.current
@@ -299,9 +352,9 @@ export const Gallery = () => {
 
     if (status === "clicked") {
       if (clickMove === "left") {
-        move(slide, (slide + CAROUSEL_ITEMS.length - 1) % CAROUSEL_ITEMS.length)
+        move(slide, moveIndex(slide, -1))
       } else if (clickMove === "right") {
-        move(slide, (slide + 1) % CAROUSEL_ITEMS.length)
+        move(slide, moveIndex(slide, 1))
       } else {
         setStatus("stationary")
         openPhotoView(slide)
@@ -402,8 +455,10 @@ export const Gallery = () => {
               CAROUSEL_ITEMS[slide]}
           </div>
           <div className="carousel-control">
-            <div
+            <button
+              type="button"
               className="control left"
+              aria-label="이전 사진"
               onMouseDown={() => {
                 if (statusRef.current === "stationary") setClickMove("left")
               }}
@@ -412,9 +467,11 @@ export const Gallery = () => {
               }}
             >
               <ArrowLeft className="arrow" />
-            </div>
-            <div
+            </button>
+            <button
+              type="button"
               className="control right"
+              aria-label="다음 사진"
               onMouseDown={() => {
                 if (statusRef.current === "stationary") setClickMove("right")
               }}
@@ -423,14 +480,17 @@ export const Gallery = () => {
               }}
             >
               <ArrowLeft className="arrow right" />
-            </div>
+            </button>
           </div>
         </div>
         <div className="carousel-indicator">
           {CAROUSEL_ITEMS.map((_, idx) => (
             <button
               key={idx}
+              type="button"
               className={`indicator${idx === slide ? " active" : ""}`}
+              aria-label={`${idx + 1}번 사진 보기`}
+              aria-current={idx === slide}
               onClick={() =>
                 onIndicatorClick(statusRef.current, slideRef.current, idx)
               }
@@ -451,11 +511,11 @@ export const Gallery = () => {
               <>
                 <div className="photo-list">
                   {GALLERY_IMAGES.map((image, idx) => (
-                    <img
+                    <button
                       key={idx}
-                      src={image}
-                      alt={`${idx}`}
-                      draggable={false}
+                      type="button"
+                      className="photo-button"
+                      aria-label={`${idx + 1}번 사진 크게 보기`}
                       onClick={() => {
                         if (idx !== slideRef.current) {
                           move(slideRef.current, idx)
@@ -465,7 +525,17 @@ export const Gallery = () => {
                           openPhotoView(idx)
                         }, 0)
                       }}
-                    />
+                    >
+                      <img
+                        src={image.src}
+                        srcSet={image.srcSet}
+                        sizes={image.sizes}
+                        alt={image.alt}
+                        draggable={false}
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    </button>
                   ))}
                 </div>
                 <div className="break" />

@@ -35,6 +35,7 @@ cp .env.example .env
 - `VITE_KAKAO_SDK_JS_KEY`
 - `VITE_SERVER_URL`
 - `VITE_STATIC_ONLY`
+- `VITE_PREVIEW_IMAGE_VERSION`
 
 ## Content customization
 
@@ -54,6 +55,7 @@ Set these repository values before deployment:
 - Variables
   - `VITE_SERVER_URL`
   - `VITE_STATIC_ONLY`
+  - `VITE_PREVIEW_IMAGE_VERSION`
 
 Also confirm:
 
