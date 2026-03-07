@@ -169,52 +169,48 @@ const NaverMap = ({ naver }: { naver: any }) => {
 
 export const Map = () => {
   const [naver, setNaver] = useState<any>(null)
-  const [mapRequested, setMapRequested] = useState(false)
   const [mapLoading, setMapLoading] = useState(false)
   const [mapUnavailable, setMapUnavailable] = useState(!NAVER_MAP_CLIENT_ID)
 
-  const requestMapLoad = async () => {
+  useEffect(() => {
     if (!NAVER_MAP_CLIENT_ID) {
       setMapUnavailable(true)
       return
     }
-    if (mapLoading || naver) return
+    let cancelled = false
 
-    setMapRequested(true)
-    setMapLoading(true)
-    try {
-      const loadedNaver = await loadNaverSdk()
-      if (loadedNaver?.maps) {
-        setNaver(loadedNaver)
-        setMapUnavailable(false)
-      } else {
-        setMapUnavailable(true)
+    const loadMap = async () => {
+      setMapLoading(true)
+      try {
+        const loadedNaver = await loadNaverSdk()
+        if (cancelled) return
+
+        if (loadedNaver?.maps) {
+          setNaver(loadedNaver)
+          setMapUnavailable(false)
+        } else {
+          setMapUnavailable(true)
+        }
+      } catch {
+        if (!cancelled) {
+          setMapUnavailable(true)
+        }
+      } finally {
+        if (!cancelled) {
+          setMapLoading(false)
+        }
       }
-    } catch {
-      setMapUnavailable(true)
-    } finally {
-      setMapLoading(false)
     }
-  }
+
+    loadMap()
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   return (
     <>
-      {!mapRequested && !mapUnavailable && (
-        <div className="map-fallback" role="status" aria-live="polite">
-          <div className="title">지도를 불러오시겠어요?</div>
-          <div className="description">
-            버튼을 누르면 네이버 지도를 로드합니다.
-          </div>
-          <button
-            type="button"
-            className="map-load-button"
-            onClick={requestMapLoad}
-          >
-            지도 불러오기
-          </button>
-        </div>
-      )}
-      {mapRequested && !mapUnavailable && (
+      {!mapUnavailable && (
         <>
           {mapLoading && (
             <div className="map-fallback" role="status" aria-live="polite">
@@ -231,15 +227,6 @@ export const Map = () => {
           <div className="description">
             네이버 지도 API 연결이 원활하지 않아 길찾기 버튼으로 안내합니다.
           </div>
-          {NAVER_MAP_CLIENT_ID && (
-            <button
-              type="button"
-              className="map-load-button"
-              onClick={requestMapLoad}
-            >
-              다시 시도
-            </button>
-          )}
         </div>
       )}
       <NavigationButtons />
