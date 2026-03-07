@@ -8,6 +8,7 @@
 @use "./component/information";
 @use "./component/modal";
 @use "./component/shareButton";
+@use "./component/quickActions";
 
 :root {
   --theme-color: #b6864f;
@@ -83,6 +84,15 @@ button {
   padding: 0;
 }
 
+button:focus-visible {
+  outline: 2px solid rgba(182, 134, 79, 0.75);
+  outline-offset: 2px;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   margin: 0;
   overflow-x: hidden;
@@ -153,6 +163,7 @@ svg {
       gap: 0.75rem;
       border-radius: calc(var(--radius-card) + 0.2rem);
       overflow: visible;
+      scroll-margin-top: 0.75rem;
 
       @media (width > 980px) {
         opacity: 0;
@@ -246,6 +257,10 @@ svg {
         animation-name: inherit !important;
         animation-duration: inherit !important;
       }
+    }
+
+    @media (max-width: 980px) {
+      padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 5rem);
     }
   }
 }

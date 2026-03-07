@@ -8,13 +8,14 @@ import { Gallery } from "./component/gallery"
 import { Information } from "./component/information"
 import { LazyDiv } from "./component/lazyDiv"
 import { ShareButton } from "./component/shareButton"
+import { QuickActions } from "./component/quickActions"
 
 function App() {
   return (
     <div className="background">
       <BGEffect />
       <div className="card-view">
-        <LazyDiv className="card-group">
+        <LazyDiv className="card-group" id="top-section">
           {/* 표지 */}
           <Cover />
 
@@ -30,7 +31,7 @@ function App() {
           <Gallery />
         </LazyDiv>
 
-        <LazyDiv className="card-group">
+        <LazyDiv className="card-group" id="location-section">
           {/* 오시는길 */}
           <Location />
         </LazyDiv>
@@ -42,6 +43,7 @@ function App() {
 
         <ShareButton />
       </div>
+      <QuickActions />
     </div>
   )
 }
