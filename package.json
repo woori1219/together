@@ -5,7 +5,7 @@
   "author": "Ju Ho Nam <jhnamnam@gmail.com> (https://juhonamnam.github.io/)",
   "license": "MIT",
   "private": true,
-  "homepage": "https://gyaler.github.io/together",
+  "homepage": "https://woori1219.github.io/together",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
