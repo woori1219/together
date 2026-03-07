@@ -34,6 +34,35 @@ export const Gallery = () => {
   const { openModal, closeModal } = useModal()
   const carouselRef = useRef<HTMLDivElement>({} as HTMLDivElement)
 
+  const openPhotoView = useCallback(
+    (idx: number) => {
+      openModal({
+        className: "photo-view-modal",
+        closeOnClickBackground: true,
+        header: <div className="title">사진 크게 보기</div>,
+        content: (
+          <div className="photo-view-wrapper">
+            <img
+              src={GALLERY_IMAGES[idx]}
+              alt={`gallery-${idx + 1}`}
+              draggable={false}
+            />
+          </div>
+        ),
+        footer: (
+          <Button
+            buttonStyle="style2"
+            className="bg-light-grey-color text-dark-color"
+            onClick={closeModal}
+          >
+            닫기
+          </Button>
+        ),
+      })
+    },
+    [openModal, closeModal],
+  )
+
   useEffect(() => {
     // preload images
     GALLERY_IMAGES.forEach((image) => {
@@ -221,13 +250,14 @@ export const Gallery = () => {
         move(slide, (slide + 1) % CAROUSEL_ITEMS.length)
       } else {
         setStatus("stationary")
+        openPhotoView(slide)
       }
     } else if (status === "dragging") {
       dragEnd(slide, dragOptionRef.current, carouselRef.current.clientWidth)
     } else if (status === "clickCanceled") {
       setStatus("stationary")
     }
-  }, [dragEnd, move])
+  }, [dragEnd, move, openPhotoView])
 
   useEffect(() => {
     const carouselElement = carouselRef.current
@@ -373,12 +403,13 @@ export const Gallery = () => {
                       alt={`${idx}`}
                       draggable={false}
                       onClick={() => {
-                        if (statusRef.current === "stationary") {
-                          if (idx !== slideRef.current) {
-                            move(slideRef.current, idx)
-                          }
-                          closeModal()
+                        if (idx !== slideRef.current) {
+                          move(slideRef.current, idx)
                         }
+                        closeModal()
+                        setTimeout(() => {
+                          openPhotoView(idx)
+                        }, 0)
                       }}
                     />
                   ))}
