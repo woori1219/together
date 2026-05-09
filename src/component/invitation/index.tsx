@@ -25,10 +25,15 @@ export const Invitation = () => {
 
       <div className="break" />
 
-      <div className="content">서로의 온기가 되어줄 두 사람이</div>
-      <div className="content">사랑의 약속을 하려 합니다.</div>
+      <div className="content">
+        반듯한 인상에 세심한 배려심을 가진 그를 만나
+      </div>
+      <div className="content">편안함과 안정감을 느꼈고,</div>
+      <div className="content">그 감정은 깊은 신뢰가 되었습니다.</div>
       <div className="break" />
-      <div className="content">귀한 걸음 하시어</div>
+      <div className="content">이제 그 신뢰 위에서</div>
+      <div className="content">함께 새로운 시작을 하려 합니다.</div>
+      <div className="break" />
       <div className="content">축복해 주시면 감사하겠습니다.</div>
 
       <div className="break" />

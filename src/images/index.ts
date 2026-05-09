@@ -21,7 +21,7 @@ const getImageSrcSm = (id: string) => allWebpImages[`./${id}-sm.webp`]
 
 export const COVER_IMAGE = {
   src: coverImage,
-  srcSet: `${coverImageSm} 900w, ${coverImage} 1600w`,
+  srcSet: `${coverImageSm} 900w, ${coverImage} 976w`,
   sizes: "(max-width: 980px) calc(100vw - 2rem), 480px",
   alt: "신랑 신부 웨딩 사진",
 }
