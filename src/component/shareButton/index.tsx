@@ -7,14 +7,14 @@ import {
   WEDDING_DATE,
   WEDDING_DATE_FORMAT,
 } from "../../const"
-import { PREVIEW_IMAGE_VERSION } from "../../env"
+import sharePreviewImage from "../../images/share-preview.jpg"
 import { useState } from "react"
 import ktalkIcon from "../../icons/ktalk-icon.png"
 import { LazyDiv } from "../lazyDiv"
 import { loadKakaoSdk } from "../store"
 
 const baseUrl = import.meta.env.BASE_URL
-const previewImagePath = `${baseUrl.replace(/\/$/, "")}/preview_image.jpg?v=${PREVIEW_IMAGE_VERSION}`
+const toAbsoluteUrl = (url: string) => new URL(url, window.location.href).href
 
 export const ShareButton = () => {
   const [loading, setLoading] = useState(false)
@@ -35,6 +35,9 @@ export const ShareButton = () => {
               return
             }
 
+            const siteUrl = toAbsoluteUrl(baseUrl)
+            const imageUrl = toAbsoluteUrl(sharePreviewImage)
+
             kakao.Share.sendDefault({
               objectType: "location",
               address: SHARE_ADDRESS,
@@ -43,38 +46,18 @@ export const ShareButton = () => {
                 title: `${GROOM_FULLNAME} ❤️ ${BRIDE_FULLNAME}의 결혼식에 초대합니다.`,
                 description:
                   WEDDING_DATE.format(WEDDING_DATE_FORMAT) + "\n" + LOCATION,
-                imageUrl:
-                  window.location.protocol +
-                  "//" +
-                  window.location.host +
-                  previewImagePath,
+                imageUrl,
                 link: {
-                  mobileWebUrl:
-                    window.location.protocol +
-                    "//" +
-                    window.location.host +
-                    baseUrl,
-                  webUrl:
-                    window.location.protocol +
-                    "//" +
-                    window.location.host +
-                    baseUrl,
+                  mobileWebUrl: siteUrl,
+                  webUrl: siteUrl,
                 },
               },
               buttons: [
                 {
                   title: "초대장 보기",
                   link: {
-                    mobileWebUrl:
-                      window.location.protocol +
-                      "//" +
-                      window.location.host +
-                      baseUrl,
-                    webUrl:
-                      window.location.protocol +
-                      "//" +
-                      window.location.host +
-                      baseUrl,
+                    mobileWebUrl: siteUrl,
+                    webUrl: siteUrl,
                   },
                 },
               ],

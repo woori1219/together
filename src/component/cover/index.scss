@@ -26,7 +26,8 @@
   .image-wrapper {
     position: relative;
     width: 100%;
-    height: clamp(20rem, 70vw, 30rem);
+    aspect-ratio: 4 / 4.35;
+    max-height: 30rem;
     overflow: hidden;
     border-radius: 0.9rem;
     display: flex;
